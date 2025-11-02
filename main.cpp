@@ -120,7 +120,6 @@ public:
         rotation_ += 180.0f * deltaTime;
         if (rotation_ >= 360.0f) rotation_ = 0.0f;
         std::rotate(segments_.begin(), segments_.begin() + 1, segments_.end());
-        cout << "Obstacol rotit cu " << rotation_ << " grade" << endl;
     }
     [[nodiscard]] bool checkCollision(const Ball& ball) const {
         float dy = abs(ball.getY() - centerY_);
