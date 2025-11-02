@@ -296,26 +296,25 @@ int main() {
     cout << "Se potrivesc? " << (c1.matches(c2) ? "Da" : "Nu") << endl;
 
     Ball b_demo(500.0f, ColorType::GREEN);
-    cout << "Demo Ball: " << b_demo << endl;
+    cout << "Apel comenzi pentru minge: " << b_demo << endl;
     cout << "Y: " << b_demo.getY() << ", Raza: " << b_demo.getRadius() << endl;
     b_demo.simulateJump();
     b_demo.updatePhysics();
     b_demo.setColor(ColorType::YELLOW);
     cout << "Dupa update: " << b_demo << endl;
     Ball b_copy = b_demo;
-    b_copy = b_demo;
 
     Segment s_demo(ColorType::RED, 0.0f, 90.0f);
-    cout << "Demo Segment: " << s_demo << ", Culoare: " << s_demo.getColor() << endl;
+    cout << "Apel comenzi pentru segmente: " << s_demo << ", Culoare: " << s_demo.getColor() << endl;
 
     Obstacle o_demo(300.0f);
-    cout << "Demo Obstacle: " << o_demo << endl;
+    cout << "Apel comenzi pentru obstacle: " << o_demo << endl;
     cout << "Raza: " << o_demo.getRadius() << endl;
     o_demo.rotate(0.1f);
     (void)o_demo.checkCollision(b_demo);
 
     Pickup p_demo(400.0f);
-    cout << "Demo Pickup: " << p_demo << endl;
+    cout << "Apel comenzi pentru pickup " << p_demo << endl;
     cout << "Y: " << p_demo.getY() << ", Raza: " << p_demo.getRadius() << endl;
     cout << "Culoare: " << p_demo.getColor() << ", Tip: " << static_cast<int>(p_demo.getColorType()) << endl;
     p_demo.randomizeColor();
