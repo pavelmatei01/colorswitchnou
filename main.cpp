@@ -285,6 +285,6 @@ int main() {
         }
     }
     std::cout<<"\n Joc incheiat! Scor final: "<<game.getScore()<<std::endl;
-    std::cout<<"Jocul s-a incheiat."<<std::endl;
+    std::cout<<"Jocul s-a terminat."<<std::endl;
     return 0;
 }
