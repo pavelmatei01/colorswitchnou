@@ -203,6 +203,7 @@ private:
         }
         cout << "Nivelul 1 a fost incarcat" << endl;
     }
+public:
     [[nodiscard]] float progres() const {
         float traveled = INITIAL_Y - ball_.getY();
         float progress = (traveled / TOTAL_DISTANCE) * 100.0f;
@@ -211,7 +212,6 @@ private:
         cout << "Progres: " << progress << "%" << endl;
         return progress;
     }
-public:
     Game() : ball_(600.0f, static_cast<ColorType>(rand() % 4)), gameOver_(false), score_(0) {
         incarcarejoc();
         cout << "Joc initializat in modul consola" << endl;
@@ -279,7 +279,6 @@ public:
     }
     [[nodiscard]] bool isGameOver() const { return gameOver_; }
     [[nodiscard]] int getScore() const { return score_; }
-    [[nodiscard]] float progres() const { return progres(); }
     friend ostream &operator<<(ostream &os, const Game &g) {
         os << "Joc: " << g.obstacles_.size() << " obstacole, scor " << g.score_ << " , " << g.ball_;
         return os;
@@ -313,7 +312,7 @@ int main() {
     cout << "Demo Obstacle: " << o_demo << endl;
     cout << "Raza: " << o_demo.getRadius() << endl;
     o_demo.rotate(0.1f);
-    o_demo.checkCollision(b_demo);
+    (void)o_demo.checkCollision(b_demo);
 
     Pickup p_demo(400.0f);
     cout << "Demo Pickup: " << p_demo << endl;
