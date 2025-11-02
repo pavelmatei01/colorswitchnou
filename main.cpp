@@ -118,7 +118,7 @@ public:
     void rotate() {
 
         std::rotate(segments_.begin(), segments_.begin() + 1, segments_.end());
-        cout<<"Am rotit obstacolul cu 180 de grade"<<endl;
+        cout<<"Am rotit obstacolul cu 90 de grade"<<endl;
     }
     [[nodiscard]] bool checkCollision(const Ball& ball) const {
         float dy = abs(ball.getY() - centerY_);
