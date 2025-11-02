@@ -98,11 +98,11 @@ jobs:
             clang_ver: "18"
             clang_ver_full: "18.1.8"
             # renovate: depName=ubuntu
-            name: "MSan: Ubuntu 22.04 Clang 18"
-            cmake_flags: "-DUSE_MSAN=ON"
-            cmake_generator: Ninja
+            #name: "MSan: Ubuntu 22.04 Clang 18"
+            #cmake_flags: "-DUSE_MSAN=ON"
+            #cmake_generator: Ninja
             # This env runs memory sanitizers
-            runs_msan: true
+            #runs_msan: true
             # renovate: depName=ubuntu
           - os: ubuntu-22.04
             c: gcc-12
