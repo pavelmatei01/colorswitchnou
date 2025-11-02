@@ -290,8 +290,8 @@ int main() {
 
     cout << "Pornire demo cu creari si apeluri publice" << endl;
 
-    Color c1(ColorType::RED);
-    Color c2(ColorType::BLUE);
+    Color c1(static_cast<ColorType>(rand() % 4));
+    Color c2(static_cast<ColorType>(rand() % 4));
     cout << "Culoare 1: " << c1 << ", Tip: " << static_cast<int>(c1.getType()) << endl;
     cout << "Se potrivesc? " << (c1.matches(c2) ? "Da" : "Nu") << endl;
 
