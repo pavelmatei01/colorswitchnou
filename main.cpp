@@ -219,7 +219,7 @@ public:
         if (gameOver_) return;
         ball_.updatePhysics();
         for (auto& obs : obstacles_) {
-            obs.rotate(1.0f / 60.0f);
+            obs.rotate();
         }
         for (const auto& obs : obstacles_) {
             if (obs.checkCollision(ball_)) {
