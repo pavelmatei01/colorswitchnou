@@ -279,7 +279,7 @@ public:
     }
     [[nodiscard]] bool isGameOver() const { return gameOver_; }
     [[nodiscard]] int getScore() const { return score_; }
-    [[nodiscard]] float getProgres() const { return progres(); }
+    [[nodiscard]] float progres() const { return progres(); }
     friend ostream &operator<<(ostream &os, const Game &g) {
         os << "Joc: " << g.obstacles_.size() << " obstacole, scor " << g.score_ << " , " << g.ball_;
         return os;
@@ -291,7 +291,6 @@ int main() {
 
     cout << "Pornire demo cu creari si apeluri publice" << endl;
 
-    // Demo creari si apeluri simple pentru clase de baza
     Color c1(ColorType::RED);
     Color c2(ColorType::BLUE);
     cout << "Culoare 1: " << c1 << ", Tip: " << static_cast<int>(c1.getType()) << endl;
@@ -326,7 +325,6 @@ int main() {
     p_demo.setCollected();
     cout << "Dupa colectare: " << p_demo << endl;
 
-    // Acum pornire joc ca in codul vechi
     cout << "\nPornire joc in modul consola" << endl;
     Game game;
     cout << game << endl;
@@ -337,7 +335,7 @@ int main() {
         }
         game.updateLevel();
         game.render();
-        game.getProgres();
+        (void)game.progres();
     }
 
     cout << "\nJoc incheiat! Scor final: " << game.getScore() << endl;
