@@ -40,7 +40,7 @@ private:
     float y_;
     float velocityY_;
     const float GRAVITY = -9.81f;
-    const float JUMP_FORCE = 10.0f;
+    const float JUMP_FORCE = 12.0f;
 public:
     Ball(float y, ColorType InitialColor) : radius_(15.0f), color_(InitialColor), y_(y), velocityY_(0.0f) {
         cout << "Minge creata, avand culoarea " << color_ << " si raza " << radius_ << ", aflandu-se la coordonata " << y_ << endl;
@@ -117,7 +117,7 @@ public:
     }
     void rotate() {
 
-        std::rotate(segments_.begin(), segments_.begin() + 1, segments_.end());
+        ranges::rotate(segments_.begin(), segments_.begin() + 1, segments_.end());
         cout<<"Am rotit obstacolul cu 90 de grade"<<endl;
     }
     [[nodiscard]] bool checkCollision(const Ball& ball) const {
@@ -131,6 +131,7 @@ public:
         return !match;
     }
     [[nodiscard]] float getRadius() const { return radius_; }
+    [[nodiscard]] float getY() const { return centerY_; }
     friend ostream &operator<<(ostream &os, const Obstacle &o) {
         os << "Obstacol la y=" << o.centerY_ << " cu raza " << o.radius_ << " si segmente: ";
         for (const auto& s : o.segments_) {
@@ -218,7 +219,11 @@ public:
         if (gameOver_) return;
         ball_.updatePhysics();
         for (auto& obs : obstacles_) {
-            obs.rotate();
+
+            float dy=abs(ball_.getY()-obs.getY());
+            if (dy>obs.getRadius()+ball_.getRadius()) {
+                obs.rotate();
+            }
         }
         for (const auto& obs : obstacles_) {
             if (obs.checkCollision(ball_)) {
@@ -246,7 +251,7 @@ public:
     static bool handleImput() {
         static int FrameCount = 0;
         ++FrameCount;
-        if (FrameCount % 5 == 0) return true;
+        if (FrameCount % 3 == 0) return true;
         return false;
     }
     void render() {
