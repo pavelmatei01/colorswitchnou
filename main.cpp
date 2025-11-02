@@ -55,7 +55,7 @@ public:
             y_ = other.y_;
             velocityY_ = other.velocityY_;
         }
-        cout << "Operator= apelat pentru Ball la y=" << y_ << endl;
+        cout << "Operator= apelat pentru minge la y=" << y_ << endl;
         return *this;
     }
     ~Ball() {
