@@ -116,10 +116,10 @@ public:
         }
         cout << "Obstacol creat la y=" << y << " cu raza " << radius_ << endl;
     }
-    void rotate(float deltaTime) {
-        rotation_ += 180.0f * deltaTime;
-        if (rotation_ >= 360.0f) rotation_ = 0.0f;
+    void rotate() {
+
         std::rotate(segments_.begin(), segments_.begin() + 1, segments_.end());
+        cout<<"Am rotit obstacolul cu 180 de grade"<<endl;
     }
     [[nodiscard]] bool checkCollision(const Ball& ball) const {
         float dy = abs(ball.getY() - centerY_);
@@ -309,7 +309,7 @@ int main() {
     Obstacle o_demo(300.0f);
     cout << "Apel comenzi pentru obstacle: " << o_demo << endl;
     cout << "Raza: " << o_demo.getRadius() << endl;
-    o_demo.rotate(0.1f);
+
     (void)o_demo.checkCollision(b_demo);
 
     Pickup p_demo(400.0f);
