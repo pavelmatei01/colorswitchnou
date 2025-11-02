@@ -99,10 +99,9 @@ public:
 class Obstacle {
     vector<Segment> segments_;
     float centerY_;
-    float rotation_;
     float radius_;
 public:
-    explicit Obstacle(float y) : centerY_(y), rotation_(0.0f), radius_(40.0f) {
+    explicit Obstacle(float y) : centerY_(y), radius_(40.0f) {
         int freq[4] = { 0,0,0,0 };
         for (int i = 0; i < 4; i++) {
             int culoare;
