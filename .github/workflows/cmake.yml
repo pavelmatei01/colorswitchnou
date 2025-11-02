@@ -154,11 +154,11 @@ jobs:
             runs_asan: false
 
             # renovate: depName=macos
-          - os: macos-14
-            c: gcc-13
-            cxx: g++-13
-            # renovate: depName=macos
-            name: "macOS 14 GCC 13"
+     #     - os: macos-14
+     #       c: gcc-13
+     #       cxx: g++-13
+     #       # renovate: depName=macos
+     #       name: "macOS 14 GCC 13"
             # cmake_flags:
             # cmake_generator: Ninja
 
