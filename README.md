@@ -1,4 +1,5 @@
-# Nu primesc notă pentru că nu am pus titlu și descriere
+# Color Switch
+Color Switch este un joc inspirat de titlul popular cu același nume, disponibil pe Android și iOS. Jocul este format din mai multe nivele, în care jucătorul controlează o minge colorată în diverse nuanțe și o ghidează prin numeroase obstacole (de asemenea colorate). Dacă culoarea obstacolului nu se potrivește cu cea a mingii, jocul se termină.
 
 ### Folosiți template-ul corespunzător grupei voastre!
 
