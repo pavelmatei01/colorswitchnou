@@ -61,7 +61,7 @@ void Joc::initializareNivel() {
     // Daca il vrei din nou, spune-mi!
 
     // [LOGICA GENERARE RANDOM HERE]
-    int numarObstacole = 5;
+    int numarObstacole = 10;
     float distantaIntreObstacole = 700.0f;
     float yCurent = 300.0f;
     TipCuloare culoarePrezisa = player_->getCuloare().getTip();
