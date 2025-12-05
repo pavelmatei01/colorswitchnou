@@ -12,6 +12,8 @@ Nivel::Nivel(const Nivel& other) {
     }
 }
 
+// --- THESE FUNCTIONS MUST BE HERE IN NIVEL.CPP ---
+
 Nivel& Nivel::operator=(Nivel other) {
     swap(*this, other);
     return *this;
@@ -30,15 +32,13 @@ int Nivel::update(Player& player) {
         (*it)->update();
         bool deSters = (*it)->interactioneaza(player);
         if (deSters) {
-            // Adunam punctele (trebuie sa existe getPuncte in ObiectJoc)
             puncteFrame += (*it)->getPuncte();
             it = elemente.erase(it);
         } else {
             ++it;
         }
     }
-    return puncteFrame; // Returnam punctele catre Joc
-
+    return puncteFrame;
 }
 
 void Nivel::draw(sf::RenderWindow& window) const {
