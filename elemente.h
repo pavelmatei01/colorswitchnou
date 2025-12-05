@@ -113,7 +113,7 @@ private:
 class LinieSosire : public ObiectJoc {
     float latime_;
 public:
-    explicit LinieSosire(float y);  // ADDED: explicit
+    explicit LinieSosire(float y);
     std::unique_ptr<ObiectJoc> clone() const override;
     void update() override;
     bool interactioneaza(Player& player) override;
