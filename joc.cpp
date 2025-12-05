@@ -7,9 +7,11 @@
 
 Joc::Joc()
     : window_(sf::VideoMode(1920, 1080), "Color Switch", sf::Style::Close | sf::Style::Titlebar),
-      isGameOver_(false),
-      isVictorie_(false),
-      score_(0) // Initializam scorul cu 0
+
+score_(0),
+isGameOver_(false),
+isVictorie_(false) // Initializam scorul cu 0
+
 {
     window_.setFramerateLimit(60);
     std::srand(static_cast<unsigned>(std::time(nullptr)));
