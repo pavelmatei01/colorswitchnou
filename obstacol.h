@@ -22,7 +22,7 @@ inline void adaugaSegmentArc(sf::VertexArray& va, sf::Vector2f centru, float rIn
         float cosA = std::cos(unghi);
         float sinA = std::sin(unghi);
 
-        // Triangle Strip: Exterior apoi Interior
+
         va.append(sf::Vertex(sf::Vector2f(centru.x + rExt * cosA, centru.y + rExt * sinA), col));
         va.append(sf::Vertex(sf::Vector2f(centru.x + rInt * cosA, centru.y + rInt * sinA), col));
     }

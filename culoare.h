@@ -4,7 +4,7 @@
 #include <exception>
 #include <SFML/Graphics.hpp>
 
-// --- Exceptii ---
+//exceptii
 class EroareJoc : public std::exception {
 protected:
     std::string mesaj;

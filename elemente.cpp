@@ -100,38 +100,36 @@ void ObstacolDublu::draw(sf::RenderWindow& window) const {
 }
 void ObstacolDublu::afisare(std::ostream& os) const { os << "Obstacol Dublu la " << y_; }
 
-// 1. Definirea variabilei statice (obligatoriu in .cpp)
+
 sf::Texture Stea::textureStea;
-// 2. Implementarea functiei de incarcare
+
 void Stea::incarcaTextura() {
-    // Asigura-te ca "star.png" este langa executabil!
+
     if (!textureStea.loadFromFile("star.png")) {
-        // Fallback: Daca nu gaseste imaginea, macar nu crapa, dar va arata un patrat alb
+
         std::cerr << "EROARE CRITICA: Nu s-a gasit star.png!" << std::endl;
     }
-    // Activeaza filtrarea liniara pentru ca steaua sa nu para pixelata cand se roteste
+
     textureStea.setSmooth(true);
 }
 Stea::Stea(float y) : ObiectJoc(y, Culoare(TipCuloare::GALBEN)) {
     sprite_.setTexture(textureStea);
     sf::Vector2u marimeImagine = textureStea.getSize();
     sprite_.setOrigin(marimeImagine.x / 2.0f, marimeImagine.y / 2.0f);
-    // === MODIFICARE DIMENSIUNE ===
-    // SchimbatorCuloare are raza 15.f => Diametru 30.f
-    // Setam tinta la 30.0f ca sa fie identice vizual.
+
     float dimensiuneTinta = 50.0f;
-    // Calculam scara
+
     float factorScara = dimensiuneTinta / static_cast<float>(marimeImagine.x);
     sprite_.setScale(factorScara, factorScara);
     sprite_.setPosition(960.f, y_);
 }
 std::unique_ptr<ObiectJoc> Stea::clone() const { return std::make_unique<Stea>(*this); }
 void Stea::update() {
-    // Efect vizual: rotim usor steaua in fiecare cadru
+
     sprite_.rotate(2.0f);
 }
 bool Stea::interactioneaza(Player& player) {
-    // Coliziune simpla pe baza distantei (raza de colectare aprox 30 pixeli)
+
     if (std::abs(player.getY() - y_) < 35.0f) {
         std::cout << " *** Stea Colectata ***" << std::endl;
         return true;
@@ -139,7 +137,7 @@ bool Stea::interactioneaza(Player& player) {
     return false;
 }
 void Stea::draw(sf::RenderWindow& window) const {
-    // 4. Desenam sprite-ul in loc de forma geometrica veche
+
     window.draw(sprite_);
 }
 void Stea::afisare(std::ostream& os) const { os << "Stea (Sprite) la " << y_; }
@@ -162,37 +160,32 @@ sf::Vector2f ObstacolPatrat::rotestePunct(sf::Vector2f punct, float unghiGrade) 
     return sf::Vector2f(punct.x * c - punct.y * s, punct.x * s + punct.y * c);
 }
 bool ObstacolPatrat::interactioneaza(Player& player) {
-    // 1. Verificare bounding box general (sa nu calculam degeaba daca e departe)
+
     float halfL = latura_ / 2.0f;
     float maxDist = (halfL + grosime_) * 1.5f;
     if (std::abs(player.getY() - y_) > maxDist + player.getRaza()) return false;
-    // 2. Aducem playerul in sistemul local al patratului (ca si cum patratul nu s-ar roti)
+
     float dy = player.getY() - y_;
     float dx = 0.0f; // Player e centrat pe X
-    // Rotim invers pozitia jucatorului cu unghiul obstacolului
+
     sf::Vector2f posLocal = rotestePunct(sf::Vector2f(dx, dy), -rotatie_);
     float absX = std::abs(posLocal.x);
     float absY = std::abs(posLocal.y);
     float r = player.getRaza();
-    // Limitele peretilor patratului (fara rotatie)
+
     float inner = halfL;
     float outer = halfL + grosime_;
-    // Verificam coliziunea cu peretii "indreptati"
+
     bool lovit = false;
     int indexLatura = -1;
-    // Indexurile laturilor in sistem local:
-    // 0 = Sus (y negativ), 1 = Dreapta (x pozitiv), 2 = Jos (y pozitiv), 3 = Stanga (x negativ)
-    // Dar atentie la coordonatele SFML (Y creste in jos).
-    // Aici, segmenteCulori_ sunt: 0=Rosu, 1=Albastru, 2=Verde, 3=Galben.
-    // Trebuie sa mapam geometria la culori.
-    // Verificare pereti Verticali (Stanga/Dreapta)
+
     if (absY < outer + r && absX > inner - r && absX < outer + r) {
         lovit = true;
-        // Determinare latura exacta
+
         if (posLocal.x > 0) indexLatura = 1; // Dreapta
         else indexLatura = 3; // Stanga
     }
-    // Verificare pereti Orizontali (Sus/Jos)
+
     if (absX < outer + r && absY > inner - r && absY < outer + r) {
         lovit = true;
         if (posLocal.y > 0) indexLatura = 2; // Jos
@@ -210,28 +203,24 @@ void ObstacolPatrat::draw(sf::RenderWindow& window) const {
     sf::Vector2f centru(960.f, y_);
     float H = latura_ / 2.0f;
     float G = grosime_;
-    // Puncte locale pentru un segment (latura de sus, index 0)
-    // Apoi rotim cu 90 grade pentru urmatoarele
+
     for(int i=0; i<4; ++i) {
         sf::Color col = segmenteCulori_[i].getSFMLColor();
-        // Definim o latura ca un dreptunghi local
-        // Latura 0 (Sus): X de la -H-G la H+G, Y de la -H-G la -H
-        // Ajustam coordonatele pentru a forma "rama" corect
-        // Metoda simpla: Desenam 4 dreptunghiuri rotite
+
         std::vector<sf::Vector2f> pct(4);
-        // Coordonate pentru latura "TOP" in spatiul local
+
         pct[0] = {-H - G, -H - G};
         pct[1] = {H + G, -H - G};
         pct[2] = {H + G, -H};
         pct[3] = {-H - G, -H};
-        // Rotim punctele cu 90 * i grade + rotatie_
+
         float unghiLatura = i * 90.0f;
         for(auto& p : pct) {
-            // Rotire pentru pozitionarea laturii (0, 90, 180, 270)
+
             p = rotestePunct(p, unghiLatura);
-            // Rotire globala a obiectului
+
             p = rotestePunct(p, rotatie_);
-            // Translatie
+
             p += centru;
             va.append(sf::Vertex(p, col));
         }
@@ -261,21 +250,20 @@ void ObstacolBanda::update() {
     while (offsetX_ < 0.0f) offsetX_ += lungimeTotala;
 }
 bool ObstacolBanda::interactioneaza(Player& player) {
-    // 1. Coliziune Y (inaltime)
+
     if (player.getY() + player.getRaza() < y_ - inaltime_/2.0f ||
         player.getY() - player.getRaza() > y_ + inaltime_/2.0f) {
         return false;
     }
-    // 2. Calcul index culoare
+
     float lungimeTotala = modelCulori_.size() * latimeSegment_;
-    // Pozitia virtuala pe banda infinita
-    // 960 este pozitia jucatorului. Scadem offsetul benzii.
+
     float pozitiePeBanda = 960.0f - offsetX_;
-    // Normalizare modulo
+
     while (pozitiePeBanda < 0.0f) pozitiePeBanda += lungimeTotala;
     while (pozitiePeBanda >= lungimeTotala) pozitiePeBanda -= lungimeTotala;
     int index = static_cast<int>(pozitiePeBanda / latimeSegment_);
-    // Safety check
+
     if (index < 0) index = 0;
     if (index >= (int)modelCulori_.size()) index = (int)modelCulori_.size() - 1;
     if (!player.getCuloare().sePotriveste(modelCulori_[index])) {
@@ -285,7 +273,7 @@ bool ObstacolBanda::interactioneaza(Player& player) {
 }
 void ObstacolBanda::draw(sf::RenderWindow& window) const {
     float lungimeTotala = modelCulori_.size() * latimeSegment_;
-    // Desenam 3 copii pentru acoperire perfecta
+
     for (int k = -1; k <= 1; ++k) {
         float bazaX = k * lungimeTotala + offsetX_;
         // Optimizare clipping
@@ -334,7 +322,6 @@ void ObstacolDouaElice::verificaElice(const Player& p, sf::Vector2f centru, floa
     float r = p.getRaza();
     float g = grosime_ / 2.0f;
     int indexLovit = -1;
-    // Verificam cele 4 brate (intersectie dreptunghi-cerc simplificata)
     if (px > -r && px < raza_ + r && py > -g - r && py < g + r) indexLovit = 0; // Dreapta
     else if (py > -r && py < raza_ + r && px > -g - r && px < g + r) indexLovit = 1; // Jos
     else if (px < r && px > -raza_ - r && py > -g - r && py < g + r) indexLovit = 2; // Stanga

@@ -10,7 +10,6 @@ void Player::update() {
     velocityY_ += GRAVITATIE;
     y_ += velocityY_;
 
-    // Limita jos (podea)
     if (y_ > 800) {
         y_ = 800;
         velocityY_ = 0;

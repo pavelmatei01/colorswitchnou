@@ -4,7 +4,7 @@
 #include <iostream>
 #include <ctime>
 #include <cstdlib>
-#include <string> // Necesar pentru std::to_string
+#include <string>
 
 Joc::Joc()
     : window_(sf::VideoMode(1920, 1080), "Color Switch", sf::Style::Close | sf::Style::Titlebar),
@@ -15,7 +15,7 @@ Joc::Joc()
     window_.setFramerateLimit(60);
     std::srand(static_cast<unsigned>(std::time(nullptr)));
 
-    // Centrare fereastra
+
     sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
     int x = (desktop.width - LATIME_FEREASTRA) / 2;
     int y = (desktop.height - INALTIME_FEREASTRA) / 2;
@@ -27,14 +27,14 @@ Joc::Joc()
     camera_.setSize(LATIME_FEREASTRA, INALTIME_FEREASTRA);
     camera_.setCenter(LATIME_FEREASTRA / 2.0f, INALTIME_FEREASTRA / 2.0f);
 
-    // --- 1. BACKGROUND ---
+
     if (bgTexture_.loadFromFile("background.jpg")) {
         bgSprite_.setTexture(bgTexture_);
         sf::Vector2u marimeImg = bgTexture_.getSize();
         bgSprite_.setScale(1920.0f / marimeImg.x, 1080.0f / marimeImg.y);
     }
 
-    // --- 2. SCOR SI FONT ---
+
     if (!font_.loadFromFile("helvetica.ttf")) {
         std::cerr << "EROARE: Nu s-a gasit helvetica.ttf! Asigura-te ca fisierul este in folderul proiectului." << std::endl;
     }
@@ -45,10 +45,8 @@ Joc::Joc()
     scoreText_.setPosition(30.f, 30.f); // Stanga sus
     scoreText_.setString("0"); // Pornim de la 0
 
-    // --- 3. RESURSE STATICE ---
-    Stea::incarcaTextura();
 
-    // Player - Culoare initiala random
+    Stea::incarcaTextura();
     int randomColorIndex = std::rand() % 4;
     Culoare culoareInitiala(static_cast<TipCuloare>(randomColorIndex));
     player_ = std::make_unique<Player>(800.0f, culoareInitiala);
@@ -61,12 +59,11 @@ void Joc::initializareNivel() {
     float distantaIntreObstacole = 700.0f;
     float yCurent = 300.0f;
 
-    // Tine minte ce culoare are jucatorul (sau va avea dupa un schimbator)
-    // pentru a evita generarea aceleiasi culori la urmatorul schimbator.
+
     TipCuloare culoarePrezisa = player_->getCuloare().getTip();
 
     for (int i = 0; i < numarObstacole; ++i) {
-        // Generare Obstacol Random
+
         int tipObstacol = std::rand() % 5;
         switch (tipObstacol) {
             case 0: nivel_.adaugaElement(std::make_unique<ObstacolRotativ>(yCurent)); break;
@@ -79,40 +76,39 @@ void Joc::initializareNivel() {
                 break;
         }
 
-        // Logică pentru elementele dintre obstacole (Stele si Schimbatoare)
+
         bool steaLaMijloc = (std::rand() % 2 == 0);
 
-        // La obstacolul Banda (tip 4), preferam stea la mijloc pentru ca e greu de pus schimbator
+
         if (tipObstacol == 4) steaLaMijloc = true;
 
         if (i < numarObstacole - 1) {
             float yMijloc = yCurent - (distantaIntreObstacole / 2.0f);
 
             if (steaLaMijloc) {
-                // Doar o stea intre obstacole
+
                 nivel_.adaugaElement(std::make_unique<Stea>(yMijloc));
             } else {
-                // Stea langa obstacol + Schimbator la mijloc
+
                 nivel_.adaugaElement(std::make_unique<Stea>(yCurent));
 
-                // Creăm schimbătorul folosind culoarea pe care vrem să o evităm (cea curentă)
+
                 auto schimbator = std::make_unique<SchimbatorCuloare>(yMijloc, culoarePrezisa);
 
-                // === FIX: Actualizăm culoarea prezisă cu CULOAREA NOUĂ din schimbător ===
-                // Folosim getCuloare() din SchimbatorCuloare, nu getCuloareObiect() din bază
+
                 culoarePrezisa = schimbator->getCuloare().getTip();
 
                 nivel_.adaugaElement(std::move(schimbator));
             }
         } else {
-            // Ultimul obstacol - punem o stea deasupra lui dacă nu a fost deja pusă
+
             if (!steaLaMijloc) nivel_.adaugaElement(std::make_unique<Stea>(yCurent));
         }
 
         yCurent -= distantaIntreObstacole;
     }
 
-    // Linia de sosire
+
     nivel_.adaugaElement(std::make_unique<LinieSosire>(yCurent - 300.0f));
 }
 
@@ -132,18 +128,18 @@ void Joc::procesareEvenimente() {
         }
 
         if (event.type == sf::Event::KeyPressed) {
-            // Iesire pe Escape
+
             if (event.key.code == sf::Keyboard::Escape) {
                 window_.close();
             }
 
-            // Actiune pe SPACE
+
             if (event.key.code == sf::Keyboard::Space) {
                 if (!isGameOver_ && !isVictorie_) {
-                    // Joc Activ: Saritura
+
                     player_->saritura();
                 } else {
-                    // Game Over / Victorie: Inchide jocul la apasarea SPACE
+
                     window_.close();
                 }
             }
@@ -155,8 +151,8 @@ void Joc::update() {
     try {
         player_->update();
 
-        // --- ACTUALIZARE SCOR ---
-        // Nivelul returnează punctele acumulate în acest frame (ex: a atins o stea)
+
+
         int puncteNoi = nivel_.update(*player_);
 
         if (puncteNoi > 0) {
@@ -164,7 +160,8 @@ void Joc::update() {
             scoreText_.setString(std::to_string(score_));
         }
 
-    } catch (const NotificareVictorie&) {
+    } catch (const NotificareVictorie&e) {
+        std::cout<<e.what()<<std::endl;
         gestioneazaVictorie();
     } catch (const EroareLogica& e) {
         gestioneazaInfrangere(e.what());
@@ -172,15 +169,15 @@ void Joc::update() {
 }
 
 void Joc::render() {
-    window_.clear(sf::Color::Black); // Fundal negru
+    window_.clear(sf::Color::Black);
 
     if (isGameOver_ || isVictorie_) {
-        // --- ECRAN FINAL (Game Over sau Victorie) ---
 
-        // 1. Resetam camera pentru a desena textul static pe ecran
+
+
         window_.setView(window_.getDefaultView());
 
-        // 2. Configuram Textul Principal (Titlu)
+
         sf::Text titluText;
         titluText.setFont(font_);
         titluText.setCharacterSize(80);
@@ -194,37 +191,35 @@ void Joc::render() {
             titluText.setFillColor(sf::Color::Red);
         }
 
-        // Centrare Titlu
+
         sf::FloatRect textRect = titluText.getLocalBounds();
         titluText.setOrigin(textRect.left + textRect.width/2.0f, textRect.top + textRect.height/2.0f);
         titluText.setPosition(LATIME_FEREASTRA / 2.0f, INALTIME_FEREASTRA / 2.0f - 50.0f);
 
-        // 3. Configuram Textul Scorului Final
+
         sf::Text scorFinalText;
         scorFinalText.setFont(font_);
         scorFinalText.setCharacterSize(50);
         scorFinalText.setFillColor(sf::Color::White);
         scorFinalText.setString("Scor Final: " + std::to_string(score_));
 
-        // Centrare Scor
+
         sf::FloatRect scorRect = scorFinalText.getLocalBounds();
         scorFinalText.setOrigin(scorRect.left + scorRect.width/2.0f, scorRect.top + scorRect.height/2.0f);
         scorFinalText.setPosition(LATIME_FEREASTRA / 2.0f, INALTIME_FEREASTRA / 2.0f + 50.0f);
 
-        // 4. Desenare
+
         window_.draw(titluText);
         window_.draw(scorFinalText);
 
     } else {
-        // --- JOC ACTIV ---
 
-        // 1. BACKGROUND (Static, nu se misca cu camera)
         window_.setView(window_.getDefaultView());
         window_.draw(bgSprite_);
 
-        // 2. LUMEA JOCULUI (Camera urmareste jucatorul)
+
         float targetY = player_->getY();
-        // Camera nu coboara sub jumatatea ecranului (doar urca)
+
         if (targetY > INALTIME_FEREASTRA / 2.0f) targetY = INALTIME_FEREASTRA / 2.0f;
 
         camera_.setCenter(LATIME_FEREASTRA / 2.0f, targetY);
@@ -233,7 +228,7 @@ void Joc::render() {
         nivel_.draw(window_);
         player_->draw(window_);
 
-        // 3. HUD SCOR (Static, deasupra lumii)
+
         window_.setView(window_.getDefaultView());
         window_.draw(scoreText_);
     }
@@ -243,10 +238,10 @@ void Joc::render() {
 
 void Joc::gestioneazaVictorie() {
     isVictorie_ = true;
-    std::cout << "VICTORIE!" << std::endl;
+
 }
 
 void Joc::gestioneazaInfrangere(const std::string& motiv) {
     isGameOver_ = true;
-    std::cout << "GAME OVER: " << motiv << std::endl;
+    std::cout << motiv << std::endl;
 }

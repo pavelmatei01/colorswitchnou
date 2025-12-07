@@ -17,7 +17,7 @@ void afiseazaMeniu() {
 
 
         if (!(std::cin >> optiune)) {
-            std::cout << ">>> EROARE: Te rog introdu un numar, nu litere!" << std::endl;
+            std::cout << "EROARE: Te rog introdu un numar, nu litere!" << std::endl;
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
@@ -27,7 +27,7 @@ void afiseazaMeniu() {
         if (optiune >= 1 && optiune <= 4) {
             break;
         } else {
-            std::cout << ">>> EROARE: Numarul trebuie sa fie intre 1 si 4!" << std::endl;
+            std::cout <<  "EROARE: Numarul trebuie sa fie intre 1 si 4!" << std::endl;
         }
     }
 

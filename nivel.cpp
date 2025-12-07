@@ -12,7 +12,6 @@ Nivel::Nivel(const Nivel& other) {
     }
 }
 
-// --- THESE FUNCTIONS MUST BE HERE IN NIVEL.CPP ---
 
 Nivel& Nivel::operator=(Nivel other) {
     swap(*this, other);
@@ -22,6 +21,7 @@ Nivel& Nivel::operator=(Nivel other) {
 Nivel::~Nivel() {}
 
 void Nivel::adaugaElement(std::unique_ptr<ObiectJoc> el) {
+    std::cout<<*el<<std::endl;
     elemente.push_back(std::move(el));
 }
 
