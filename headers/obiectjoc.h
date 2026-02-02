@@ -1,4 +1,3 @@
-
 #pragma once
 #include "culoare.h"
 #include <memory>

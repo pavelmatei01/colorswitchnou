@@ -1,12 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <cmath>
-
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
-#endif
-
-// Functie helper pentru a desena un segment de cerc (folosita la obstacole)
+const double M_PI=3.14159265358979323846;
 inline void adaugaSegmentArc(sf::VertexArray& va, sf::Vector2f centru, float rInt, float rExt,
                              float startGrade, float stopGrade, sf::Color col, float rotatie) {
     float startAjustat = startGrade + rotatie;

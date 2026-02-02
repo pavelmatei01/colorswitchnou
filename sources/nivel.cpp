@@ -1,4 +1,4 @@
-#include "nivel.h"
+#include "../headers/nivel.h"
 #include <algorithm>
 
 void swap(Nivel& first, Nivel& second) noexcept {

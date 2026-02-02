@@ -121,3 +121,14 @@ public:
 private:
     void afisare(std::ostream& os) const override;
 };
+class PowerUpMulticolor : public ObiectJoc {
+    sf::Color culoareAfisare_;
+public:
+    explicit PowerUpMulticolor(float y);
+    std::unique_ptr<ObiectJoc> clone() const override;
+    void update() override;
+    bool interactioneaza(Player& player) override;
+    void draw(sf::RenderWindow& window) const override;
+private:
+    void afisare(std::ostream& os) const override;
+};

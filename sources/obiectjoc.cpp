@@ -1,5 +1,5 @@
 
-#include "obiectjoc.h"
+#include "../headers/obiectjoc.h"
 
 int ObiectJoc::contorElemente = 0;
 

@@ -1,9 +1,10 @@
 #include "elemente.h"
 #include "player.h"
 #include "obstacol.h"
+#include "utils.h"
 #include <cmath>
 #include <iostream>
-#include <cstdlib>  // For std::rand()
+#include <cstdlib>
 
 ObstacolRotativ::ObstacolRotativ(float y)
     : ObiectJoc(y, Culoare(TipCuloare::MULTICOLOR)), razaMedie_(100.f), grosime_(20.f), rotatie_(0.f) {
@@ -17,14 +18,11 @@ void ObstacolRotativ::update() {
     if (rotatie_ > 360.f) rotatie_ -= 360.f;
 }
 bool ObstacolRotativ::interactioneaza(Player& player) {
-    // Verificam inelul
-    float rInt = razaMedie_ - grosime_/2;
-    float rExt = razaMedie_ + grosime_/2;
     float distY = std::abs(player.getY() - y_);
-    // Coliziune doar daca suntem in grosimea inelului
-    if (distY > rInt - player.getRaza() && distY < rExt + player.getRaza()) {
+    float marja = grosime_/2 + player.getRaza();
+
+    if (esteInInterval<float>(distY, razaMedie_, marja)) {
         float dy = player.getY() - y_;
-        // 960 este centrul X, dar calculam atan2 doar pe dy (dx=0 virtual)
         float unghiGrade = std::atan2(dy, 0.f) * 180.f / M_PI;
         if (unghiGrade < 0) unghiGrade += 360.f;
         float unghiLocal = unghiGrade - rotatie_;
@@ -47,29 +45,24 @@ void ObstacolRotativ::draw(sf::RenderWindow& window) const {
     window.draw(va);
 }
 void ObstacolRotativ::afisare(std::ostream& os) const { os << "Obstacol Rotativ la " << y_; }
-
 ObstacolDublu::ObstacolDublu(float y)
     : ObiectJoc(y, Culoare(TipCuloare::MULTICOLOR)),
       razaInt_(100.0f), razaExt_(140.0f), grosime_(15.0f), rotInt_(0.0f), rotExt_(0.0f)
 {
-    // Sincronizam culorile pentru efect vizual placut
     culoriInt_ = { Culoare(TipCuloare::ROSU), Culoare(TipCuloare::ALBASTRU), Culoare(TipCuloare::VERDE), Culoare(TipCuloare::GALBEN) };
     culoriExt_ = culoriInt_;
 }
-std::unique_ptr<ObiectJoc> ObstacolDublu::clone() const {
-    return std::make_unique<ObstacolDublu>(*this);
-}
+std::unique_ptr<ObiectJoc> ObstacolDublu::clone() const { return std::make_unique<ObstacolDublu>(*this); }
 void ObstacolDublu::update() {
-    rotInt_ += vitezaRotatieGlobala * 0.8f; // Interior mai lent, spre dreapta
-    rotExt_ -= vitezaRotatieGlobala * 1.2f; // Exterior mai rapid, spre stanga
+    rotInt_ += vitezaRotatieGlobala * 0.8f;
+    rotExt_ -= vitezaRotatieGlobala * 1.2f;
     if(rotInt_ > 360.0f) rotInt_ -= 360.0f;
     if(rotExt_ < 0.0f) rotExt_ += 360.0f;
 }
 void ObstacolDublu::verificaInel(const Player& player, float raza, float rotatie, const std::vector<Culoare>& culori) {
-    float rInt = raza - grosime_/2;
-    float rExt = raza + grosime_/2;
     float distY = std::abs(player.getY() - y_);
-    if (distY > rInt - player.getRaza() && distY < rExt + player.getRaza()) {
+    float marja = grosime_/2 + player.getRaza();
+    if (esteInInterval<float>(distY, raza, marja)) {
         float dy = player.getY() - y_;
         float unghiGrade = std::atan2(dy, 0.f) * 180.f / M_PI;
         if (unghiGrade < 0) unghiGrade += 360.f;
@@ -90,11 +83,9 @@ bool ObstacolDublu::interactioneaza(Player& player) {
 void ObstacolDublu::draw(sf::RenderWindow& window) const {
     sf::VertexArray va(sf::TriangleStrip);
     sf::Vector2f c(960.f, y_);
-    // Exterior
     for(int i=0; i<4; ++i) adaugaSegmentArc(va, c, razaExt_-grosime_/2, razaExt_+grosime_/2, i*90.f, i*90.f+91.f, culoriExt_[i].getSFMLColor(), rotExt_);
     window.draw(va);
     va.clear();
-    // Interior
     for(int i=0; i<4; ++i) adaugaSegmentArc(va, c, razaInt_-grosime_/2, razaInt_+grosime_/2, i*90.f, i*90.f+91.f, culoriInt_[i].getSFMLColor(), rotInt_);
     window.draw(va);
 }
@@ -104,40 +95,32 @@ void ObstacolDublu::afisare(std::ostream& os) const { os << "Obstacol Dublu la "
 sf::Texture Stea::textureStea;
 
 void Stea::incarcaTextura() {
-
-    if (!textureStea.loadFromFile("star.png")) {
-
+    if (!textureStea.loadFromFile("assets/star.png")) {
         std::cerr << "EROARE CRITICA: Nu s-a gasit star.png!" << std::endl;
     }
-
     textureStea.setSmooth(true);
 }
 Stea::Stea(float y) : ObiectJoc(y, Culoare(TipCuloare::GALBEN)) {
     sprite_.setTexture(textureStea);
     sf::Vector2u marimeImagine = textureStea.getSize();
     sprite_.setOrigin(marimeImagine.x / 2.0f, marimeImagine.y / 2.0f);
-
     float dimensiuneTinta = 50.0f;
-
     float factorScara = dimensiuneTinta / static_cast<float>(marimeImagine.x);
     sprite_.setScale(factorScara, factorScara);
     sprite_.setPosition(960.f, y_);
 }
 std::unique_ptr<ObiectJoc> Stea::clone() const { return std::make_unique<Stea>(*this); }
 void Stea::update() {
-
     sprite_.rotate(2.0f);
 }
 bool Stea::interactioneaza(Player& player) {
-
-    if (std::abs(player.getY() - y_) < 35.0f) {
+    if (esteInInterval<float>(std::abs(player.getY() - y_), 0.0f, 35.0f)) {
         std::cout << " *** Stea Colectata ***" << std::endl;
         return true;
     }
     return false;
 }
 void Stea::draw(sf::RenderWindow& window) const {
-
     window.draw(sprite_);
 }
 void Stea::afisare(std::ostream& os) const { os << "Stea (Sprite) la " << y_; }
@@ -160,13 +143,13 @@ sf::Vector2f ObstacolPatrat::rotestePunct(sf::Vector2f punct, float unghiGrade) 
     return sf::Vector2f(punct.x * c - punct.y * s, punct.x * s + punct.y * c);
 }
 bool ObstacolPatrat::interactioneaza(Player& player) {
-
     float halfL = latura_ / 2.0f;
     float maxDist = (halfL + grosime_) * 1.5f;
+
     if (std::abs(player.getY() - y_) > maxDist + player.getRaza()) return false;
 
     float dy = player.getY() - y_;
-    float dx = 0.0f; // Player e centrat pe X
+    float dx = 0.0f;
 
     sf::Vector2f posLocal = rotestePunct(sf::Vector2f(dx, dy), -rotatie_);
     float absX = std::abs(posLocal.x);
@@ -178,18 +161,16 @@ bool ObstacolPatrat::interactioneaza(Player& player) {
 
     bool lovit = false;
     int indexLatura = -1;
-
     if (absY < outer + r && absX > inner - r && absX < outer + r) {
         lovit = true;
-
-        if (posLocal.x > 0) indexLatura = 1; // Dreapta
-        else indexLatura = 3; // Stanga
+        if (posLocal.x > 0) indexLatura = 1;
+        else indexLatura = 3;
     }
 
     if (absX < outer + r && absY > inner - r && absY < outer + r) {
         lovit = true;
-        if (posLocal.y > 0) indexLatura = 2; // Jos
-        else indexLatura = 0; // Sus
+        if (posLocal.y > 0) indexLatura = 2;
+        else indexLatura = 0;
     }
     if (lovit && indexLatura != -1) {
         if (!player.getCuloare().sePotriveste(segmenteCulori_[indexLatura])) {
@@ -203,24 +184,15 @@ void ObstacolPatrat::draw(sf::RenderWindow& window) const {
     sf::Vector2f centru(960.f, y_);
     float H = latura_ / 2.0f;
     float G = grosime_;
-
     for(int i=0; i<4; ++i) {
         sf::Color col = segmenteCulori_[i].getSFMLColor();
-
         std::vector<sf::Vector2f> pct(4);
-
-        pct[0] = {-H - G, -H - G};
-        pct[1] = {H + G, -H - G};
-        pct[2] = {H + G, -H};
-        pct[3] = {-H - G, -H};
-
+        pct[0] = {-H - G, -H - G}; pct[1] = {H + G, -H - G};
+        pct[2] = {H + G, -H}; pct[3] = {-H - G, -H};
         float unghiLatura = i * 90.0f;
         for(auto& p : pct) {
-
             p = rotestePunct(p, unghiLatura);
-
             p = rotestePunct(p, rotatie_);
-
             p += centru;
             va.append(sf::Vertex(p, col));
         }
@@ -229,10 +201,9 @@ void ObstacolPatrat::draw(sf::RenderWindow& window) const {
 }
 void ObstacolPatrat::afisare(std::ostream& os) const { os << "Obstacol Patrat la " << y_; }
 
+
 ObstacolBanda::ObstacolBanda(float y, bool spreDreapta)
-    : ObiectJoc(y, Culoare(TipCuloare::MULTICOLOR)),
-      latimeSegment_(400.0f), inaltime_(40.0f), offsetX_(0.0f)
-{
+    : ObiectJoc(y, Culoare(TipCuloare::MULTICOLOR)), latimeSegment_(400.0f), inaltime_(40.0f), offsetX_(0.0f) {
     if (spreDreapta) {
         vitezaDirectie_ = 4.0f;
         modelCulori_ = { Culoare(TipCuloare::ROSU), Culoare(TipCuloare::VERDE), Culoare(TipCuloare::ALBASTRU), Culoare(TipCuloare::GALBEN) };
@@ -245,25 +216,18 @@ std::unique_ptr<ObiectJoc> ObstacolBanda::clone() const { return std::make_uniqu
 void ObstacolBanda::update() {
     offsetX_ += vitezaDirectie_ * vitezaRotatieGlobala;
     float lungimeTotala = modelCulori_.size() * latimeSegment_;
-    // Mentinem offsetul in interval pozitiv [0, Total]
     while (offsetX_ >= lungimeTotala) offsetX_ -= lungimeTotala;
     while (offsetX_ < 0.0f) offsetX_ += lungimeTotala;
 }
 bool ObstacolBanda::interactioneaza(Player& player) {
-
     if (player.getY() + player.getRaza() < y_ - inaltime_/2.0f ||
-        player.getY() - player.getRaza() > y_ + inaltime_/2.0f) {
-        return false;
-    }
+        player.getY() - player.getRaza() > y_ + inaltime_/2.0f) return false;
 
     float lungimeTotala = modelCulori_.size() * latimeSegment_;
-
     float pozitiePeBanda = 960.0f - offsetX_;
-
     while (pozitiePeBanda < 0.0f) pozitiePeBanda += lungimeTotala;
     while (pozitiePeBanda >= lungimeTotala) pozitiePeBanda -= lungimeTotala;
     int index = static_cast<int>(pozitiePeBanda / latimeSegment_);
-
     if (index < 0) index = 0;
     if (index >= (int)modelCulori_.size()) index = (int)modelCulori_.size() - 1;
     if (!player.getCuloare().sePotriveste(modelCulori_[index])) {
@@ -273,10 +237,8 @@ bool ObstacolBanda::interactioneaza(Player& player) {
 }
 void ObstacolBanda::draw(sf::RenderWindow& window) const {
     float lungimeTotala = modelCulori_.size() * latimeSegment_;
-
     for (int k = -1; k <= 1; ++k) {
         float bazaX = k * lungimeTotala + offsetX_;
-        // Optimizare clipping
         if (bazaX > 1920.0f || bazaX + lungimeTotala < 0.0f) continue;
         for (size_t i = 0; i < modelCulori_.size(); ++i) {
             sf::RectangleShape rect(sf::Vector2f(latimeSegment_, inaltime_));
@@ -290,9 +252,7 @@ void ObstacolBanda::draw(sf::RenderWindow& window) const {
 void ObstacolBanda::afisare(std::ostream& os) const { os << "Banda la " << y_; }
 
 ObstacolDouaElice::ObstacolDouaElice(float y)
-    : ObiectJoc(y, Culoare(TipCuloare::MULTICOLOR)),
-      raza_(180.0f), grosime_(20.0f), rotatieStanga_(0.0f), rotatieDreapta_(0.0f)
-{
+    : ObiectJoc(y, Culoare(TipCuloare::MULTICOLOR)), raza_(180.0f), grosime_(20.0f), rotatieStanga_(0.0f), rotatieDreapta_(0.0f) {
     centruStanga_ = sf::Vector2f(960.0f - raza_, y);
     centruDreapta_ = sf::Vector2f(960.0f + raza_, y);
     culoriStanga_ = { Culoare(TipCuloare::ROSU), Culoare(TipCuloare::ALBASTRU), Culoare(TipCuloare::VERDE), Culoare(TipCuloare::GALBEN) };
@@ -312,24 +272,19 @@ sf::Vector2f ObstacolDouaElice::rotestePunct(sf::Vector2f punct, float unghiGrad
     return sf::Vector2f(punct.x * c - punct.y * s, punct.x * s + punct.y * c);
 }
 void ObstacolDouaElice::verificaElice(const Player& p, sf::Vector2f centru, float rotatie, const std::vector<Culoare>& culori) {
-    if (std::abs(p.getY() - centru.y) > raza_ + p.getRaza() ||
-        std::abs(960.0f - centru.x) > raza_ + p.getRaza() + 200.0f) return;
+    if (std::abs(p.getY() - centru.y) > raza_ + p.getRaza() || std::abs(960.0f - centru.x) > raza_ + p.getRaza() + 200.0f) return;
     float dy = p.getY() - centru.y;
     float dx = 960.0f - centru.x;
     sf::Vector2f posLocal = rotestePunct(sf::Vector2f(dx, dy), -rotatie);
-    float px = posLocal.x;
-    float py = posLocal.y;
-    float r = p.getRaza();
-    float g = grosime_ / 2.0f;
+    float px = posLocal.x; float py = posLocal.y;
+    float r = p.getRaza(); float g = grosime_ / 2.0f;
     int indexLovit = -1;
-    if (px > -r && px < raza_ + r && py > -g - r && py < g + r) indexLovit = 0; // Dreapta
-    else if (py > -r && py < raza_ + r && px > -g - r && px < g + r) indexLovit = 1; // Jos
-    else if (px < r && px > -raza_ - r && py > -g - r && py < g + r) indexLovit = 2; // Stanga
-    else if (py < r && py > -raza_ - r && px > -g - r && px < g + r) indexLovit = 3; // Sus
+    if (px > -r && px < raza_ + r && py > -g - r && py < g + r) indexLovit = 0;
+    else if (py > -r && py < raza_ + r && px > -g - r && px < g + r) indexLovit = 1;
+    else if (px < r && px > -raza_ - r && py > -g - r && py < g + r) indexLovit = 2;
+    else if (py < r && py > -raza_ - r && px > -g - r && px < g + r) indexLovit = 3;
     if (indexLovit != -1) {
-        if (!p.getCuloare().sePotriveste(culori[indexLovit])) {
-            throw EroareLogica("Game Over: Doua Elice!");
-        }
+        if (!p.getCuloare().sePotriveste(culori[indexLovit])) throw EroareLogica("Game Over: Doua Elice!");
     }
 }
 bool ObstacolDouaElice::interactioneaza(Player& player) {
@@ -339,8 +294,7 @@ bool ObstacolDouaElice::interactioneaza(Player& player) {
 }
 void ObstacolDouaElice::deseneazaElice(sf::RenderWindow& w, sf::Vector2f centru, float rotatie, const std::vector<Culoare>& culori) const {
     sf::VertexArray va(sf::Quads);
-    float g = grosime_ / 2.0f;
-    float L = raza_;
+    float g = grosime_ / 2.0f; float L = raza_;
     for (int i = 0; i < 4; ++i) {
         sf::Color col = culori[i].getSFMLColor();
         std::vector<sf::Vector2f> puncte = { {0.0f, -g}, {L, -g}, {L, g}, {0.0f, g} };
@@ -358,14 +312,12 @@ void ObstacolDouaElice::draw(sf::RenderWindow& window) const {
 }
 void ObstacolDouaElice::afisare(std::ostream& os) const { os << "2 Elice la " << y_; }
 
-SchimbatorCuloare::SchimbatorCuloare(float y, TipCuloare culoareDeEvitat)
-    : ObiectJoc(y, Culoare(TipCuloare::MULTICOLOR)) {
+SchimbatorCuloare::SchimbatorCuloare(float y, TipCuloare culoareDeEvitat) : ObiectJoc(y, Culoare(TipCuloare::MULTICOLOR)) {
     TipCuloare nouaCuloare;
     do { nouaCuloare = static_cast<TipCuloare>(std::rand() % 4); } while (nouaCuloare == culoareDeEvitat);
     this->culoareNoua_ = Culoare(nouaCuloare);
 }
-SchimbatorCuloare::SchimbatorCuloare(const SchimbatorCuloare& other)
-    : ObiectJoc(other.y_, Culoare(TipCuloare::MULTICOLOR)), culoareNoua_(other.culoareNoua_) {}
+SchimbatorCuloare::SchimbatorCuloare(const SchimbatorCuloare& other) : ObiectJoc(other.y_, Culoare(TipCuloare::MULTICOLOR)), culoareNoua_(other.culoareNoua_) {}
 std::unique_ptr<ObiectJoc> SchimbatorCuloare::clone() const { return std::make_unique<SchimbatorCuloare>(*this); }
 void SchimbatorCuloare::update() {}
 bool SchimbatorCuloare::interactioneaza(Player& player) {
@@ -399,3 +351,44 @@ void LinieSosire::draw(sf::RenderWindow& window) const {
     window.draw(line);
 }
 void LinieSosire::afisare(std::ostream& os) const { os << "SOSIRE la " << y_; }
+
+
+
+PowerUpMulticolor::PowerUpMulticolor(float y)
+    : ObiectJoc(y, Culoare(TipCuloare::MULTICOLOR)) {
+    culoareAfisare_ = sf::Color::White;
+}
+
+std::unique_ptr<ObiectJoc> PowerUpMulticolor::clone() const {
+    return std::make_unique<PowerUpMulticolor>(*this);
+}
+
+void PowerUpMulticolor::update() {
+    int r = std::rand() % 255;
+    int g = std::rand() % 255;
+    int b = std::rand() % 255;
+    culoareAfisare_ = sf::Color(r, g, b);
+}
+
+bool PowerUpMulticolor::interactioneaza(Player& player) {
+    if (std::abs(player.getY() - y_) < 25.0f) {
+        player.activeazaMulticolor();
+        std::cout << "Power-up multicolor activat" << std::endl;
+        return true;
+    }
+    return false;
+}
+
+void PowerUpMulticolor::draw(sf::RenderWindow& window) const {
+    sf::CircleShape shape(12.f);
+    shape.setFillColor(culoareAfisare_);
+    shape.setOutlineThickness(2);
+    shape.setOutlineColor(sf::Color::White);
+    shape.setOrigin(12.f, 12.f);
+    shape.setPosition(960.f, y_);
+    window.draw(shape);
+}
+
+void PowerUpMulticolor::afisare(std::ostream& os) const {
+    os << "PowerUp Multicolor la " << y_;
+}

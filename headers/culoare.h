@@ -3,8 +3,6 @@
 #include <string>
 #include <exception>
 #include <SFML/Graphics.hpp>
-
-//exceptii
 class EroareJoc : public std::exception {
 protected:
     std::string mesaj;
@@ -23,7 +21,7 @@ public:
     const char* what() const noexcept override { return "Victorie!"; }
 };
 
-// --- Culoare ---
+
 enum class TipCuloare { GALBEN, VERDE, ROSU, ALBASTRU, MULTICOLOR };
 
 class Culoare {
