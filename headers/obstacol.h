@@ -1,13 +1,13 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <cmath>
-const double M_PI=3.14159265358979323846;
+const double PI_VAR=3.14159265358979323846;
 inline void adaugaSegmentArc(sf::VertexArray& va, sf::Vector2f centru, float rInt, float rExt,
                              float startGrade, float stopGrade, sf::Color col, float rotatie) {
     float startAjustat = startGrade + rotatie;
     float stopAjustat = stopGrade + rotatie;
-    float startRad = startAjustat * M_PI / 180.f;
-    float stopRad = stopAjustat * M_PI / 180.f;
+    float startRad = startAjustat * PI_VAR/ 180.f;
+    float stopRad = stopAjustat * PI_VAR/180.f;
 
     int segmente = 20;
     float pas = (stopRad - startRad) / segmente;

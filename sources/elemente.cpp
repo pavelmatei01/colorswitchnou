@@ -23,7 +23,7 @@ bool ObstacolRotativ::interactioneaza(Player& player) {
 
     if (esteInInterval<float>(distY, razaMedie_, marja)) {
         float dy = player.getY() - y_;
-        float unghiGrade = std::atan2(dy, 0.f) * 180.f / M_PI;
+        float unghiGrade = std::atan2(dy, 0.f) * 180.f / PI_VAR;
         if (unghiGrade < 0) unghiGrade += 360.f;
         float unghiLocal = unghiGrade - rotatie_;
         while (unghiLocal < 0) unghiLocal += 360.f;
@@ -64,7 +64,7 @@ void ObstacolDublu::verificaInel(const Player& player, float raza, float rotatie
     float marja = grosime_/2 + player.getRaza();
     if (esteInInterval<float>(distY, raza, marja)) {
         float dy = player.getY() - y_;
-        float unghiGrade = std::atan2(dy, 0.f) * 180.f / M_PI;
+        float unghiGrade = std::atan2(dy, 0.f) * 180.f / PI_VAR;
         if (unghiGrade < 0) unghiGrade += 360.f;
         float unghiLocal = unghiGrade - rotatie;
         while (unghiLocal < 0) unghiLocal += 360.f;
@@ -137,7 +137,7 @@ void ObstacolPatrat::update() {
     if (rotatie_ > 360.0f) rotatie_ -= 360.0f;
 }
 sf::Vector2f ObstacolPatrat::rotestePunct(sf::Vector2f punct, float unghiGrade) const {
-    float rad = unghiGrade * M_PI / 180.f;
+    float rad = unghiGrade * PI_VAR/ 180.f;
     float c = std::cos(rad);
     float s = std::sin(rad);
     return sf::Vector2f(punct.x * c - punct.y * s, punct.x * s + punct.y * c);
@@ -266,7 +266,7 @@ void ObstacolDouaElice::update() {
     if (rotatieDreapta_ < 0.0f) rotatieDreapta_ += 360.0f;
 }
 sf::Vector2f ObstacolDouaElice::rotestePunct(sf::Vector2f punct, float unghiGrade) const {
-    float rad = unghiGrade * M_PI / 180.f;
+    float rad = unghiGrade * PI_VAR/ 180.f;
     float c = std::cos(rad);
     float s = std::sin(rad);
     return sf::Vector2f(punct.x * c - punct.y * s, punct.x * s + punct.y * c);
